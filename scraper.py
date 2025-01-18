@@ -1,4 +1,5 @@
 import requests
+import datetime
 from bs4 import BeautifulSoup
 
 url = "https://pixelford.com/blog/"
@@ -6,10 +7,13 @@ response = requests.get( url, headers={'user-agent': 'Mozilla/5.0 (Windows NT 10
 
 html = response.content
 soup = BeautifulSoup(html, 'html.parser')
-a_tags = soup.find_all('a', class_="entry-title-link")
+blogs = soup.find_all('article', class_="type-post")
 
-# for a_tag in a_tags:
-#     print(a_tag.get_text())
+for blog in blogs:
+    title = blog.find('a', class_="entry-title-link").get_text()
 
-a_tags_list = list( map(lambda a_tag: a_tag.get_text(), a_tags) )
-print(a_tags_list)
+    blog_datetime_str = blog.find('time', class_="entry-time").get('datetime')
+    blog_datetime = datetime.datetime.fromisoformat(blog_datetime_str)
+    pretty_date = blog_datetime.strftime("%d %b %Y")
+    
+    print(f"{pretty_date} - {title}")
